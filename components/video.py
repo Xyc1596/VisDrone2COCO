@@ -44,8 +44,18 @@ class Video:
         ))
 
     @property
-    def num_annotations(self) -> int:
-        return sum(len(image) for image in self.__images.values())
+    def all_track_ids(self) -> List[int]:
+        return list(OrderedDict.fromkeys(
+            track_id for image in self.__images.values() for track_id in image.all_track_ids
+        ))
+
+    @property
+    def annotation_ids(self) -> List[int]:
+        return [anno_id for image in self.__images.values() for anno_id in image.annotation_ids]
+
+    @property
+    def all_annotation_ids(self) -> List[int]:
+        return [anno_id for image in self.__images.values() for anno_id in image.all_annotation_ids]
 
     @classmethod
     def fromCOCO(cls, obj: VideoDict) -> 'Video':
@@ -63,7 +73,8 @@ class Video:
         self,
         dataset_dir: str,
         image_num_in_other_videos: int = 0,
-        track_num_in_other_videos: int = 0
+        track_num_in_other_videos: int = 0,
+        annotation_num_in_other_videos: int = 0
     ) -> 'Video':
         # ----- Get image h & w
         image_base_names = os.listdir((video_dir := os.path.join(dataset_dir, self.file_name)))
@@ -72,13 +83,17 @@ class Video:
 
         # ----- Load annotations
         annotation_path = os.path.join(dataset_dir, "annotations", os.path.basename(self.file_name) + ".txt")
-        annotations: Dict[int, List[Annotation]] = defaultdict(list)    # divide by image_id
+        annotations: Dict[int, List[Annotation]] = defaultdict(list)    # Divided by image_id
         with open(annotation_path, 'r', encoding='utf-8') as f:
-            for line in f.readlines():
-                if (annotation := Annotation.fromVisDrone(
-                    line, image_num_in_other_videos, track_num_in_other_videos
-                )) is not None:
-                    annotations[annotation.image_id].append(annotation)
+            lines = (ls for l in f.readlines() if (ls := l.strip()))
+        for annotation_id, line in enumerate(lines, Annotation.ANNOTATION_ID_START):
+            annotation = Annotation.fromVisDrone(
+                annotation_num_in_other_videos + annotation_id,
+                line,
+                image_num_in_other_videos,
+                track_num_in_other_videos
+            )
+            annotations[annotation.image_id].append(annotation)
 
         # ----- Load image & distribute annotations
         for frame_id, img_base_name in enumerate(image_base_names, Image.FRAME_ID_START):

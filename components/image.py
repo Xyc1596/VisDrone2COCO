@@ -48,12 +48,22 @@ class Image:
         return self.__annotations[annotation_id]
 
     @property
-    def annotations(self) -> List[Annotation]:
-        return list(self.__annotations.values())
+    def track_ids(self) -> List[int]:
+        return [annotation.track_id for annotation in self.__annotations.values() if annotation.isValid]
 
     @property
-    def track_ids(self) -> List[int]:
+    def all_track_ids(self) -> List[int]:
+        """Including invalid tracks"""
         return [annotation.track_id for annotation in self.__annotations.values()]
+
+    @property
+    def annotation_ids(self) -> List[int]:
+        return [annotation.id for annotation in self.__annotations.values() if annotation.isValid]
+
+    @property
+    def all_annotation_ids(self) -> List[int]:
+        """Including invalid annotations"""
+        return [annotation.id for annotation in self.__annotations.values()]
 
 
     @classmethod
@@ -72,8 +82,8 @@ class Image:
         self.__annotations[obj["id"]] = Annotation.fromCOCO(obj)
 
     def withAnnotations(self, annotations: Sequence[Annotation]) -> 'Image':
-        for id, annotation in enumerate(annotations, Annotation.ANNOTATION_ID_START):
-            self.__annotations[id] = annotation.withId(id)
+        for annotation in annotations:
+            self.__annotations[annotation.id] = annotation
         return self
 
 

@@ -1,0 +1,10 @@
+[VisDrone]
+video_id_start = 1
+frame_id_start = 1      # Defined by VisDrone, do not change
+track_id_start = 0      # Defined by VisDrone, do not change
+annotation_id_start = 1
+category_id_start = 0
+category_names = [
+    "pedestrian", "people", "bicycle", "car", "van",
+    "truck", "tricycle", "awning-tricycle", "bus", "motor"
+]

@@ -8,4 +8,4 @@ if __name__ == '__main__':
         dataset_type = DatasetType.fromPreset(presets_path, "VisDrone")
         Dataset(dataset_type.CATEGORIES).setStartIds(dataset_type) \
                                         .loadFromVisDrone(dataset_dir) \
-                                        .json(indent=2)
+                                        .json()

@@ -21,7 +21,7 @@ class AnnotationDict(TypedDict):
 
 class Annotation:
     ANNOTATION_ID_START: int = 1
-    TRACK_ID_START: int = 1
+    TRACK_ID_START: int = 0
     CATEGORY_ID_START: int = 0
 
     def __init__(

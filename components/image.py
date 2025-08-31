@@ -98,5 +98,5 @@ class Image:
             "width": self.width,
             "height": self.height
         }, [
-            annotation.dict() for annotation in self.__annotations.values()
+            annotation.dict() for annotation in self.__annotations.values() if annotation.isValid
         ]
